@@ -1,0 +1,7 @@
+-- =======================================
+-- Výsledková tabulka her, které byly neúspìšnì dokonèené. Mìla by navíc
+-- (oproti pohledu VITEZOVE) ukazovat, kolik min bylo správnì odhaleno.
+--
+-- @author Radek Vais
+-- @version 23.3.2018
+-- =======================================

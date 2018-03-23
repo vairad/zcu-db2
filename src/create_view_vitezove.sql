@@ -1,0 +1,8 @@
+-- =======================================
+-- Výsledková tabulka her, které byly úspìšnì dokonèené. Mìla by ukazovat
+-- parametry obtížnosti (rozmìry oblasti a poèet min) dané hry a také dobu
+-- hraní hry (rozdíl èasových znaèek posledního a prvního tahu)
+--
+-- @author Radek Vais
+-- @version 23.3.2018
+-- =======================================

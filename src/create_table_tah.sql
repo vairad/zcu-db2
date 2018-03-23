@@ -1,0 +1,7 @@
+-- =======================================
+-- Hráčem odkrývaná pole v zaminované oblasti. Ke každému tahu se bude
+-- automaticky ukládat časová značka, kdy byl tah vykonán.
+--
+-- @author Radek Vais
+-- @version 23.3.2018
+-- =======================================

@@ -1,0 +1,8 @@
+-- =======================================
+-- Průběžně aktualizované informace o probíhající hře. Obsahuje časové  
+-- značky prvního a naposledy provedeného tahu, počet označených min a 
+-- stav hry.
+--
+-- @author Radek Vais
+-- @version 23.3.2018
+-- =======================================

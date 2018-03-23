@@ -1,0 +1,8 @@
+-- =======================================
+-- Elementární část zaminované oblasti definovaná svými souřadnicemi,
+-- která může nést minu nebo informaci, s kolika zaminovanými 
+-- poli sousedí.
+--
+-- @author Radek Vais
+-- @version 23.3.2018
+-- =======================================

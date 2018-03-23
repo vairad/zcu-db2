@@ -1,0 +1,7 @@
+-- =======================================
+-- Hráčem označovaná pole, o kterých si myslí, že jsou zaminovaná.
+--
+--
+-- @author Radek Vais
+-- @version 23.3.2018
+-- =======================================

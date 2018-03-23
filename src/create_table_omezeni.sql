@@ -1,0 +1,9 @@
+-- =======================================
+-- Každá vlastní obtížnost musí splňovat jistá omezení. Např. počet 
+-- řádků či sloupců nesmí být menší než 9 a větší než 100. Také je
+-- vhodné pohlídat, aby počet rozmístěných min v zaminované oblasti
+-- nebyl příliš velký, např. nepřekročil 40 procent její velikosti.
+--
+-- @author Radek Vais
+-- @version 23.3.2018
+-- =======================================
