@@ -11,11 +11,11 @@
 -- @version 23.3.2018
 -- =======================================
 
-DROP TABLE sem_obtiznost;
+--DROP TABLE sem_obtiznost;
 
 CREATE TABLE sem_obtiznost
 (
-    id_obtiznost NUMBER(10) PRIMARY KEY,
+    id    NUMBER(10) PRIMARY KEY,
     nazev VARCHAR2(50) NOT NULL,
     sirka NUMBER(4) NOT NULL,
     vyska NUMBER(4) NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE sem_obtiznost
 )
 ;
 
-DROP SEQUENCE seq_sem_obtiznost_id;
+--DROP SEQUENCE seq_sem_obtiznost_id;
 
 CREATE SEQUENCE seq_sem_obtiznost_id
     INCREMENT BY 1
@@ -31,19 +31,20 @@ CREATE SEQUENCE seq_sem_obtiznost_id
     NOCYCLE 
 ;  
 
+--DROP TRIGGER  trigger_bi_sem_obtiznost_id;
 
 CREATE OR REPLACE TRIGGER trigger_bi_sem_obtiznost_id
 BEFORE INSERT 
 ON sem_obtiznost
 FOR EACH ROW
 BEGIN
-   :new.id_obtiznost := seq_sem_obtiznost_id.nextval;
+   :new.id := seq_sem_obtiznost_id.nextval;
 END
 ;
 
 COMMENT ON TABLE sem_obtiznost IS 'Číselník pojmenovaných obtížností hry';
 
-COMMENT ON COLUMN sem_obtiznost.id_obtiznost IS 'Automaticky určované ID stavu hry sekvencí a triggerem';
+COMMENT ON COLUMN sem_obtiznost.id IS 'Automaticky určované ID stavu hry sekvencí a triggerem';
 
 COMMENT ON COLUMN sem_obtiznost.nazev IS 'Uživatelský název obtížnosti';
 

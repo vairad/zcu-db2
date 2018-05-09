@@ -8,7 +8,7 @@
 -- @version 24.3.2018
 -- =======================================
 
-DROP TABLE sem_stav;
+--DROP TABLE sem_stav;
 
 CREATE TABLE sem_stav
 (
