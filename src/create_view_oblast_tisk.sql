@@ -6,3 +6,10 @@
 -- @author Radek Vais
 -- @version 23.3.2018
 -- =======================================
+
+-- TO je nìjaká blbost ne???
+
+CREATE VIEW OBLAST_TISK AS
+SELECT 
+FROM table_name
+WHERE condition;

@@ -1,4 +1,4 @@
--- =======================================
+﻿-- =======================================
 -- Elementární část zaminované oblasti definovaná svými souřadnicemi,
 -- která může nést minu nebo informaci, s kolika zaminovanými 
 -- poli sousedí.
@@ -14,7 +14,8 @@ CREATE TABLE sem_pole(
     x NUMBER (4) NOT NULL,           -- xová souřadnice pole v oblasti
     y NUMBER (4) NOT NULL,           -- ynová souřadnice pole v oblasi
     oblast NUMBER(10) NOT NULL,      -- odkaz na oblast
-    info_mina NUMBER(1) NULL,    -- počet sousedních min hodnota 9 znamená 
+    info_mina NUMBER(1) NULL,        -- počet sousedních min hodnota 9 znamená 
+    zobrazeno NUMBER(1) DEFAULT 0,   -- vlajka, zda pole je již zobrazeno
     CONSTRAINT fk_pole_oblast
         FOREIGN KEY (oblast)
         REFERENCES sem_oblast (id)       
@@ -51,3 +52,5 @@ COMMENT ON COLUMN sem_pole.y IS 'Svislá pozice pole v oblasti.';
 COMMENT ON COLUMN sem_pole.oblast IS 'Odkaz na oblast, které je pole součástí';
 
 COMMENT ON COLUMN sem_pole.info_mina IS 'Počet min sousedících min ... 9 = pole je minou';
+
+COMMENT ON COLUMN sem_pole.info_mina IS 'Vlajka, zda pole je již zobrazeno (hodnoty 0/1)';
