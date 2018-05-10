@@ -17,7 +17,7 @@ CREATE TABLE sem_hra
     konec DATE,             -- triggerem upravovaný čas posledního tahu
     pocet_tahu NUMBER(4),   -- triggerem upravovaný počet tahů hry
     pocet_vlajek NUMBER(4), -- triggerem upravovaná počet vlajek uživatele  
-    stav NUMBER(10),         -- ciselniková hodnota stavu hry
+    stav NUMBER(10),        -- ciselniková hodnota stavu hry
     CONSTRAINT fk_hra_oblast
         FOREIGN KEY (oblast)
         REFERENCES sem_oblast (id)
@@ -30,17 +30,6 @@ CREATE SEQUENCE seq_sem_hra_id
     MAXVALUE 9999999999
     NOCYCLE 
 ;  
-
---DROP TRIGGER trigger_bi_sem_hra_id;
-
-CREATE OR REPLACE TRIGGER trigger_bi_sem_hra_id
-BEFORE INSERT 
-ON sem_hra
-FOR EACH ROW
-BEGIN
-   :new.id := seq_sem_hra_id.nextval;
-END
-;
 
 COMMENT ON TABLE sem_hra IS 'Tabulka her. Průběžně aktualizované informace o probíhající hře. Obsahuje časové značky prvního a naposledy provedeného tahu, počet označených min a stav hry.';
 

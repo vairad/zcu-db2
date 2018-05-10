@@ -53,4 +53,4 @@ COMMENT ON COLUMN sem_pole.oblast IS 'Odkaz na oblast, které je pole součást�
 
 COMMENT ON COLUMN sem_pole.info_mina IS 'Počet min sousedících min ... 9 = pole je minou';
 
-COMMENT ON COLUMN sem_pole.info_mina IS 'Vlajka, zda pole je již zobrazeno (hodnoty 0/1)';
+COMMENT ON COLUMN sem_pole.zobrazeno IS 'Vlajka, zda pole je již zobrazeno (hodnoty 0/1)';

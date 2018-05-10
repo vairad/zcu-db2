@@ -15,6 +15,61 @@ END
 ;
 
 
+CREATE OR REPLACE TRIGGER trigger_bi_sem_tah_played
+AFTER INSERT 
+ON sem_tah
+FOR EACH ROW
+DECLARE 
+    vn_hra_id NUMBER;
+BEGIN
+   MINESWEEPER_AUTOMATION.ODKRYJ_POLE(:new.pole);
+   SELECT h.id INTO vn_hra_id FROM sem_hra h, sem_pole p, sem_oblast o
+   WHERE h.oblast = o.id
+   AND o.id = p.oblast
+   AND p.id = :new.pole;
+   
+   UPDATE sem_hra set zacatek = :new.cas, stav = 2 WHERE id = vn_hra_id AND zacatek IS NULL;
+   
+   UPDATE sem_hra set pocet_tahu = (COALESCE(pocet_tahu, 0) + 1 ) WHERE id = vn_hra_id;
+END
+;
+
+--DROP TRIGGER trigger_bi_sem_tah_time;
+
+CREATE OR REPLACE TRIGGER trigger_bi_sem_tah_time
+BEFORE INSERT 
+ON sem_tah
+FOR EACH ROW
+BEGIN
+   :new.cas := sysdate;
+
+END
+;
+
+CREATE OR REPLACE TRIGGER trigger_bi_sem_tah_showed
+BEFORE INSERT 
+ON sem_tah
+FOR EACH ROW
+DECLARE
+  vn_zobrazeno NUMBER;
+BEGIN
+
+   SELECT COUNT(pole) INTO vn_zobrazeno FROM sem_tah WHERE pole = :new.pole;
+   IF vn_zobrazeno > 0 THEN
+        raise_application_error (-20002, 'Odkrýváte již zahrané pole.');
+   END IF;
+
+   SELECT zobrazeno INTO vn_zobrazeno FROM sem_pole WHERE id = :new.pole;
+   IF vn_zobrazeno = 1 THEN
+        raise_application_error (-20001, 'Odkrýváte již odkryté pole.');
+   END IF;
+   
+   SELECT COUNT(pole) INTO vn_zobrazeno FROM sem_mina WHERE pole = :new.pole;
+   IF vn_zobrazeno > 0 THEN
+        raise_application_error (-20003, 'Odkrýváte minou oznaèené pole.');
+   END IF;
+END
+;
 
 CREATE OR REPLACE TRIGGER trigger_bi_sem_pole_id
 BEFORE INSERT 

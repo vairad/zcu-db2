@@ -13,6 +13,8 @@ AS
     
     PROCEDURE SPOCITEJ_OBLAST( an_id_oblast IN NUMBER);
     
+    PROCEDURE VYTVOR_HRU( an_id_oblast IN NUMBER);
+    
     FUNCTION SPOCITEJ_POLE(  an_id_oblast IN NUMBER
                                 ,an_x       IN NUMBER
                                 ,an_y     IN NUMBER)
@@ -26,6 +28,8 @@ AS
                     , an_vyska IN NUMBER
                     )
     RETURN NUMBER;
+    
+    PROCEDURE ODKRYJ_POLE(an_pole_id IN NUMBER);
     
 END MINESWEEPER_AUTOMATION;
 /
@@ -70,6 +74,7 @@ AS
     IS
         vn_pocet_min NUMBER;
     BEGIN
+        dbms_output.put_line('Poèítám oblast: ' || an_id_oblast);
         FOR pole IN (SELECT x, y FROM sem_pole WHERE oblast = an_id_oblast)
         LOOP
            --  dbms_output.put_line('Poèítám pole: ' || pole.x || ',' || pole.y);
@@ -170,7 +175,34 @@ AS
     EXCEPTION
         WHEN OTHERS THEN
         RETURN -1;
-    END;
+    END VYTVOR_POLE;
+    
+    PROCEDURE VYTVOR_HRU( an_id_oblast IN NUMBER)
+    IS
+    BEGIN
+        INSERT INTO sem_hra (id, oblast, stav) VALUES (seq_sem_hra_id.nextval, an_id_oblast, 1);
+    END VYTVOR_HRU;
+    
+    PROCEDURE ODKRYJ_POLE(an_pole_id IN NUMBER)
+    IS
+        vn_miny NUMBER;
+        vn_oblast NUMBER;
+        vn_x NUMBER;
+        vn_y NUMBER;
+    BEGIN
+        UPDATE sem_pole SET zobrazeno = 1 WHERE id = an_pole_id;
+        SELECT info_mina, oblast, x, y INTO vn_miny, vn_oblast, vn_x, vn_y FROM sem_pole WHERE id = an_pole_id;
+        IF vn_miny = 0 THEN
+            FOR pole IN ( SELECT info_mina, id 
+                                FROM sem_pole 
+                                WHERE x IN (vn_x - 1, vn_x , vn_x + 1) and y IN (vn_y - 1, vn_y , vn_y + 1) 
+                                AND oblast = vn_oblast
+                                AND zobrazeno = 0)
+            LOOP
+                ODKRYJ_POLE(pole.id);
+            END LOOP;
+        END IF;
+    END ODKRYJ_POLE;
     
 END MINESWEEPER_AUTOMATION;
 /

@@ -17,17 +17,6 @@ CREATE TABLE sem_tah
         REFERENCES sem_pole (id)
 );
 
---DROP TRIGGER trigger_bi_sem_tah_time;
-
-CREATE OR REPLACE TRIGGER trigger_bi_sem_tah_time
-BEFORE INSERT 
-ON sem_tah
-FOR EACH ROW
-BEGIN
-   :new.cas := sysdate;
-END
-;
-
 COMMENT ON TABLE sem_tah IS 'Hráčem odkrývaná pole v zaminované oblasti. Ke každému tahu se bude automaticky ukládat časová značka, kdy byl tah vykonán.';
 
 COMMENT ON COLUMN sem_tah.pole IS 'Odkaz na konkrétní hráčem odkryté.';
