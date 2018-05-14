@@ -31,6 +31,9 @@ AS
     
     PROCEDURE ODKRYJ_POLE(an_pole_id IN NUMBER);
     
+    PROCEDURE VYHRA(an_oblast_id IN NUMBER);
+    
+    
 END MINESWEEPER_AUTOMATION;
 /
 
@@ -203,6 +206,13 @@ AS
             END LOOP;
         END IF;
     END ODKRYJ_POLE;
+    
+    
+    PROCEDURE VYHRA(an_oblast_id IN NUMBER)
+    IS
+    BEGIN
+        NULL; -- TODO vyhra hry
+    END VYHRA;
     
 END MINESWEEPER_AUTOMATION;
 /

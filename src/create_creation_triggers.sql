@@ -71,6 +71,28 @@ BEGIN
 END
 ;
 
+CREATE OR REPLACE TRIGGER trigger_au_sem_pole_id
+AFTER UPDATE
+ON sem_pole
+FOR EACH ROW
+DECLARE
+    an_miny NUMBER  ;
+    an_pole NUMBER ;
+    an_slapnute NUMBER;
+BEGIN
+    SELECT COUNT(id) INTO an_slapnute FROM sem_pole 
+      WHERE oblast = :new.oblast AND info_mina <> 9
+        AND zobrazeno = 1;
+    
+    SELECT (sirka * vyska), miny INTO an_pole, an_miny FROM sem_oblast
+      WHERE id = :new.oblast;
+      
+    IF (an_pole - an_slapnute) = an_miny THEN
+        MINESWEEPER_AUTOMATION.VYHRA(:new.oblast);
+    END IF;
+END
+;
+
 CREATE OR REPLACE TRIGGER trigger_bi_sem_pole_id
 BEFORE INSERT 
 ON sem_pole
