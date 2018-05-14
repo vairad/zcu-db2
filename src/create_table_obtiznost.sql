@@ -23,28 +23,9 @@ CREATE TABLE sem_obtiznost
 )
 ;
 
---DROP SEQUENCE seq_sem_obtiznost_id;
-
-CREATE SEQUENCE seq_sem_obtiznost_id
-    INCREMENT BY 1
-    MAXVALUE 9999999999
-    NOCYCLE 
-;  
-
---DROP TRIGGER  trigger_bi_sem_obtiznost_id;
-
-CREATE OR REPLACE TRIGGER trigger_bi_sem_obtiznost_id
-BEFORE INSERT 
-ON sem_obtiznost
-FOR EACH ROW
-BEGIN
-   :new.id := seq_sem_obtiznost_id.nextval;
-END
-;
-
 COMMENT ON TABLE sem_obtiznost IS 'Číselník pojmenovaných obtížností hry';
 
-COMMENT ON COLUMN sem_obtiznost.id IS 'Automaticky určované ID stavu hry sekvencí a triggerem';
+COMMENT ON COLUMN sem_obtiznost.id IS 'Manálně určované ID stavu hry.';
 
 COMMENT ON COLUMN sem_obtiznost.nazev IS 'Uživatelský název obtížnosti';
 
@@ -58,14 +39,14 @@ COMMENT ON COLUMN sem_obtiznost.pocet_min IS 'Počet hledaných min';
 -- Výchozí data číselníku
 --
 
-INSERT INTO sem_obtiznost(nazev, sirka, vyska, pocet_min)
-    VALUES( 'Začátečník', 9, 9, 10)
+INSERT INTO sem_obtiznost(id, nazev, sirka, vyska, pocet_min)
+    VALUES(1, 'Začátečník', 9, 9, 10)
 ;
 
-INSERT INTO sem_obtiznost(nazev, sirka, vyska, pocet_min)
-    VALUES( 'Pokročilý', 16, 16, 40)
+INSERT INTO sem_obtiznost(id, nazev, sirka, vyska, pocet_min)
+    VALUES(2, 'Pokročilý', 16, 16, 40)
 ;
 
-INSERT INTO sem_obtiznost(nazev, sirka, vyska, pocet_min)
-    VALUES( 'Expert', 16, 30, 99)
+INSERT INTO sem_obtiznost(id, nazev, sirka, vyska, pocet_min)
+    VALUES(3, 'Expert', 16, 30, 99)
 ;

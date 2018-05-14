@@ -32,6 +32,8 @@ AS
     PROCEDURE ODKRYJ_POLE(an_pole_id IN NUMBER);
     
     PROCEDURE VYHRA(an_oblast_id IN NUMBER);
+    PROCEDURE PROHRA(an_oblast_id IN NUMBER);
+    PROCEDURE ZOBRAZ_OBLAST(an_oblast_id IN NUMBER);
     
     
 END MINESWEEPER_AUTOMATION;
@@ -210,9 +212,51 @@ AS
     
     PROCEDURE VYHRA(an_oblast_id IN NUMBER)
     IS
+        an_miny NUMBER  ;
+        an_pole NUMBER ;
+        an_slapnute NUMBER;
     BEGIN
-        NULL; -- TODO vyhra hry
+        --dbms_output.put_line('Kontroluji vítìzství.');
+        SELECT COUNT(id) INTO an_slapnute FROM sem_pole 
+            WHERE oblast = an_oblast_id AND info_mina <> 9
+              AND zobrazeno = 1;
+    
+        SELECT (sirka * vyska), miny INTO an_pole, an_miny FROM sem_oblast
+          WHERE id = an_oblast_id;
+          
+        IF (an_pole - an_slapnute) = an_miny THEN
+            dbms_output.put_line('Vítìzství!');
+            -- uprav záznam o høe pro danou oblast, pokud je nová nebo rozehraná.
+            UPDATE sem_hra SET stav = 3, konec = sysdate WHERE oblast = an_oblast_id AND stav = 1 OR stav = 2;
+            MINESWEEPER_AUTOMATION.ZOBRAZ_OBLAST(an_oblast_id);
+        END IF;
     END VYHRA;
+    
+    
+    PROCEDURE PROHRA(an_oblast_id IN NUMBER)
+    IS
+        an_miny NUMBER  ;
+        an_pole NUMBER ;
+        an_slapnute NUMBER;
+    BEGIN
+        --dbms_output.put_line('Kontroluji prohru');
+        SELECT COUNT(id) INTO an_slapnute FROM sem_pole 
+            WHERE oblast = an_oblast_id AND info_mina = 9
+              AND zobrazeno = 1;
+                        
+        IF (an_slapnute > 0) THEN
+            dbms_output.put_line('Šlápl jsi na minu! Prohra.');
+            -- uprav záznam o høe pro danou oblast, pokud je nová nebo rozehraná.
+            UPDATE sem_hra SET stav = 4, konec = sysdate WHERE oblast = an_oblast_id AND stav = 1 OR stav = 2;
+            MINESWEEPER_AUTOMATION.ZOBRAZ_OBLAST(an_oblast_id);
+        END IF;
+    END PROHRA;
+    
+    PROCEDURE ZOBRAZ_OBLAST(an_oblast_id IN NUMBER)
+    IS
+    BEGIN
+        UPDATE sem_pole SET zobrazeno = 1 WHERE oblast = an_oblast_id;
+    END ZOBRAZ_OBLAST;
     
 END MINESWEEPER_AUTOMATION;
 /

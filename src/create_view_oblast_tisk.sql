@@ -7,9 +7,11 @@
 -- @version 23.3.2018
 -- =======================================
 
--- TO je nìjaká blbost ne???
+CREATE OR REPLACE VIEW OBLAST_TISK AS
+SELECT DISTINCT(y), OBLAST, MINESWEEPER.RADEK_OBLASTI(oblast, y) AS RADEK
+FROM sem_pole
+ORDER BY y ASC
+;
 
-CREATE VIEW OBLAST_TISK AS
-SELECT 
-FROM table_name
-WHERE condition;
+--SELECT radek FROM OBLAST_TISK WHERE oblast = 47;
+

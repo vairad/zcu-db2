@@ -11,7 +11,8 @@ AS
     PROCEDURE VYTVOR_HRU(an_id_obtiznost NUMBER);
     
     FUNCTION ZNAK_POLE( an_info_mina IN NUMBER
-                        , an_zobrazeno IN NUMBER)
+                        , an_zobrazeno IN NUMBER
+                        , an_vlajka IN NUMBER)
         RETURN CHAR;
         
     FUNCTION RADEK_OBLASTI (an_id_oblast IN NUMBER
@@ -21,6 +22,10 @@ AS
     PROCEDURE OBLAST_TISK (an_id_oblast IN NUMBER);
     
     PROCEDURE TAH(an_id_oblast IN NUMBER
+                    ,an_x IN NUMBER
+                    ,an_y IN NUMBER);
+                    
+    PROCEDURE MINA(an_id_oblast IN NUMBER
                     ,an_x IN NUMBER
                     ,an_y IN NUMBER);
 END;
@@ -47,12 +52,17 @@ AS
     END;
     
     FUNCTION ZNAK_POLE( an_info_mina IN NUMBER
-                        , an_zobrazeno IN NUMBER)
+                        , an_zobrazeno IN NUMBER
+                        , an_vlajka IN NUMBER)
     RETURN CHAR
     IS
       vc_output CHAR;
     BEGIN
-        IF an_zobrazeno = 0 THEN
+       -- dbms_output.put_line('Vlajka ' || an_vlajka || ':');
+        
+        IF an_vlajka IS NOT NULL  THEN
+            vc_output := '?';
+        ELSIF an_zobrazeno = 0 THEN
             vc_output := 'o';
         ELSE
             CASE an_info_mina
@@ -72,7 +82,10 @@ AS
      vc_radek VARCHAR2(1024);
     BEGIN
         vc_radek := '';
-        FOR pole IN (SELECT znak_pole(info_mina, zobrazeno) AS field FROM sem_pole WHERE oblast = an_id_oblast AND y = an_radek)
+        FOR pole IN (SELECT znak_pole(info_mina, zobrazeno, sem_mina.pole) AS field 
+                        FROM sem_pole 
+                        LEFT JOIN sem_mina ON sem_pole.id = sem_mina.pole
+                        WHERE oblast = an_id_oblast AND y = an_radek)
         LOOP
             vc_radek := vc_radek || ' ' || pole.field;
         END LOOP;
@@ -111,6 +124,28 @@ AS
     WHEN OTHERS THEN
         dbms_output.put_line(SQLERRM);
     END TAH;
+    
+    PROCEDURE MINA(an_id_oblast IN NUMBER
+                    ,an_x IN NUMBER
+                    ,an_y IN NUMBER)
+    IS
+        vn_pole_id NUMBER;
+    BEGIN
+        SELECT id 
+        INTO vn_pole_id 
+        FROM sem_pole 
+        WHERE oblast = an_id_oblast
+            AND x = an_x
+            AND y = an_y;
+           
+        INSERT INTO sem_mina (pole) VALUES (vn_pole_id);
+        
+    EXCEPTION
+    WHEN DUP_VAL_ON_INDEX THEN
+        DELETE FROM sem_mina WHERE pole = vn_pole_id;
+    WHEN OTHERS THEN
+        dbms_output.put_line(SQLERRM);
+    END MINA;
 END;
 /
 

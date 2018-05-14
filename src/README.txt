@@ -13,6 +13,12 @@ create_table_mina.sql
 create_table_tah.sql
 create_table_hra.sql
 
+--create views
+
+create_view_vitezove.sql
+create_view_porazeni.sql
+create_view_chybne_miny.sql
+
 -- create package for automatic events
 
 create_package_minesweeper_automation.sql
@@ -24,3 +30,4 @@ create_creation_triggers.sql
 
 -- create gaming package
 
+create_package_minesweeper.sql

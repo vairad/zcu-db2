@@ -33,7 +33,7 @@ CREATE SEQUENCE seq_sem_hra_id
 
 COMMENT ON TABLE sem_hra IS 'Tabulka her. Průběžně aktualizované informace o probíhající hře. Obsahuje časové značky prvního a naposledy provedeného tahu, počet označených min a stav hry.';
 
-COMMENT ON COLUMN sem_hra.id IS 'Automaticky určované ID hry sekvencí a triggerem.';
+COMMENT ON COLUMN sem_hra.id IS 'ID hry ze sekvence.';
 
 COMMENT ON COLUMN sem_hra.oblast IS 'Odkaz na oblast hry.';
 

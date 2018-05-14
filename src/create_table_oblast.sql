@@ -26,7 +26,7 @@ CREATE SEQUENCE seq_sem_oblast_id
 
 COMMENT ON TABLE sem_oblast IS 'Každá zaminovaná oblast je vytvořená podle vlastní obtížnosti a obsahuje její hodnoty. Hráč má za úkol oblast od min vyčistit.';
 
-COMMENT ON COLUMN sem_oblast.id IS 'Automaticky určované ID oblasti sekvencí a triggerem.';
+COMMENT ON COLUMN sem_oblast.id IS 'Automaticky určované ID ze sekvence.';
 
 COMMENT ON COLUMN sem_oblast.sirka IS 'Šířka této oblasti.';
 
