@@ -29,6 +29,10 @@ COMMENT ON COLUMN sem_omezeni.n_value IS 'Numerická hodnota.';
 COMMENT ON COLUMN sem_omezeni.c_value IS 'Textová hodnota.';
 
 
+-- =============================================================================
+-- Výchozí data číselníku
+--
+
 INSERT INTO sem_omezeni(id, name, n_value) VALUES (1, 'max_sirka', 100);
 
 INSERT INTO sem_omezeni(id, name, n_value) VALUES (2, 'max_vyska', 100);

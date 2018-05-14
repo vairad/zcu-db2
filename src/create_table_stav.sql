@@ -12,7 +12,7 @@
 
 CREATE TABLE sem_stav
 (
-    id_stav NUMBER(10) PRIMARY KEY NOT NULL,
+    id NUMBER(10) PRIMARY KEY NOT NULL,
     nazev VARCHAR2(50) NOT NULL
 )
 ;
@@ -27,15 +27,15 @@ COMMENT ON COLUMN sem_stav.nazev IS 'Uživatelsky přívětivý název stavu hry
 -- Základní hodnoty číselníku
 --
 
-INSERT INTO sem_stav (id_stav, nazev) 
+INSERT INTO sem_stav (id, nazev) 
 VALUES (1, 'Nová')
 ;
 
-INSERT INTO sem_stav(id_stav, nazev) 
+INSERT INTO sem_stav(id, nazev) 
 VALUES (2, 'Rozehraná')
 ;
 
-INSERT INTO sem_stav(id_stav, nazev) 
+INSERT INTO sem_stav(id, nazev) 
 VALUES (3, 'Vyhraná')
 ;
 

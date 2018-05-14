@@ -7,20 +7,23 @@
 -- @version 28.4.2018
 -- =======================================
 
---DROP TABLE sem_hra;
+DROP TABLE sem_hra;
 
 CREATE TABLE sem_hra
 (
     id NUMBER(10) PRIMARY KEY,
-    oblast NUMBER(10),      -- příslušná oblast hry
-    zacatek DATE,           -- triggerem upravovaný čas prvního tahu
-    konec DATE,             -- triggerem upravovaný čas posledního tahu
-    pocet_tahu NUMBER(4),   -- triggerem upravovaný počet tahů hry
-    pocet_vlajek NUMBER(4), -- triggerem upravovaná počet vlajek uživatele  
-    stav NUMBER(10),        -- ciselniková hodnota stavu hry
+    oblast NUMBER(10) NOT NULL,        -- příslušná oblast hry
+    zacatek DATE,             -- triggerem upravovaný čas prvního tahu
+    konec DATE,               -- triggerem upravovaný čas posledního tahu
+    pocet_tahu NUMBER(4),     -- triggerem upravovaný počet tahů hry
+    pocet_vlajek NUMBER(4),   -- triggerem upravovaná počet vlajek uživatele  
+    stav NUMBER(10) NOT NULL, -- ciselniková hodnota stavu hry
     CONSTRAINT fk_hra_oblast
         FOREIGN KEY (oblast)
-        REFERENCES sem_oblast (id)
+        REFERENCES sem_oblast (id),
+    CONSTRAINT fk_hra_stav
+        FOREIGN KEY (stav)
+        REFERENCES sem_stav (id)
 );
 
 -- DROP SEQUENCE seq_sem_hra_id;
