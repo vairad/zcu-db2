@@ -28,6 +28,10 @@ AS
     PROCEDURE MINA(an_id_oblast IN NUMBER
                     ,an_x IN NUMBER
                     ,an_y IN NUMBER);
+                    
+    PROCEDURE VLASTNI_HRA(an_sirka NUMBER
+                        ,an_vyska NUMBER
+                        ,an_miny NUMBER);
 END;
 /
 
@@ -43,13 +47,19 @@ AS
        MINESWEEPER_AUTOMATION.ZAMINUJ_OBLAST(vn_id_oblast);
        MINESWEEPER_AUTOMATION.SPOCITEJ_OBLAST(vn_id_oblast);
        MINESWEEPER_AUTOMATION.VYTVOR_HRU(vn_id_oblast);
-       COMMIT;
-    EXCEPTION
-        WHEN OTHERS THEN
-            dbms_output.put_line('CHYBA ALOzeni:');
-            dbms_output.put_line(SQLERRM);
-        ROLLBACK;
     END;
+    
+    PROCEDURE VLASTNI_HRA(an_sirka NUMBER
+                        ,an_vyska NUMBER
+                        ,an_miny NUMBER)
+    IS
+        vn_id_oblast NUMBER;
+    BEGIN
+       vn_id_oblast := MINESWEEPER_AUTOMATION.VYTVOR_VLASTNI_OBLAST(an_sirka, an_vyska, an_miny);
+       MINESWEEPER_AUTOMATION.ZAMINUJ_OBLAST(vn_id_oblast);
+       MINESWEEPER_AUTOMATION.SPOCITEJ_OBLAST(vn_id_oblast);
+       MINESWEEPER_AUTOMATION.VYTVOR_HRU(vn_id_oblast);
+    END VLASTNI_HRA;
     
     FUNCTION ZNAK_POLE( an_info_mina IN NUMBER
                         , an_zobrazeno IN NUMBER
@@ -94,12 +104,12 @@ AS
     
     PROCEDURE OBLAST_TISK (an_id_oblast IN NUMBER)
     IS
-        an_x_count NUMBER;
+        an_y_count NUMBER;
     BEGIN
         dbms_output.put_line('Stav oblasti ' || an_id_oblast || ':');
-        SELECT sirka INTO an_x_count FROM sem_oblast WHERE id = an_id_oblast;
+        SELECT vyska INTO an_y_count FROM sem_oblast WHERE id = an_id_oblast;
     
-        FOR vn_index IN 1..an_x_count
+        FOR vn_index IN 1..an_y_count
         LOOP
             dbms_output.put_line(MINESWEEPER.RADEK_OBLASTI(an_id_oblast, vn_index));
         END LOOP;
@@ -130,21 +140,18 @@ AS
                     ,an_y IN NUMBER)
     IS
         vn_pole_id NUMBER;
+        vn_miny NUMBER;
+        vn_vlajky NUMBER;
+        vn_exist NUMBER;
     BEGIN
-        SELECT id 
-        INTO vn_pole_id 
-        FROM sem_pole 
-        WHERE oblast = an_id_oblast
-            AND x = an_x
-            AND y = an_y;
            
         INSERT INTO sem_mina (pole) VALUES (vn_pole_id);
         
     EXCEPTION
     WHEN DUP_VAL_ON_INDEX THEN
         DELETE FROM sem_mina WHERE pole = vn_pole_id;
-    WHEN OTHERS THEN
-        dbms_output.put_line(SQLERRM);
+    WHEN NO_DATA_FOUND THEN
+        dbms_output.put_line('Toto pole nelze oznaèit za minu');
     END MINA;
 END;
 /

@@ -13,5 +13,5 @@ FROM sem_pole
 ORDER BY y ASC
 ;
 
---SELECT radek FROM OBLAST_TISK WHERE oblast = 47;
+--SELECT radek FROM OBLAST_TISK WHERE oblast = 74;
 

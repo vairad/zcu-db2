@@ -21,7 +21,7 @@ END
 -- procedury ODKRYJ_POLE.
 --
 -- @author Radek Vais
-CREATE OR REPLACE TRIGGER trigger_bi_sem_tah_played
+CREATE OR REPLACE TRIGGER trigger_ai_sem_tah_played
 AFTER INSERT 
 ON sem_tah
 FOR EACH ROW
@@ -50,14 +50,18 @@ END
 -- Trigger pøed vložením záznamu do tabulky tah nastaví aktuální èas tahu.
 --
 -- @author Radek Vais
-CREATE OR REPLACE TRIGGER trigger_bi_sem_tah_time
+CREATE OR REPLACE TRIGGER trigger_bi_sem_tah
 BEFORE INSERT 
 ON sem_tah
 FOR EACH ROW
+DECLARE
+    vn_stav NUMBER;
 BEGIN
    :new.cas := sysdate;
+   MINESWEEPER_AUTOMATION.UKONCENA_HRA(:new.pole);
 END
 ;
+
 
 -- Trigger kontroluje omezení na odkrytí pole.
 -- pole je již odkryté/zahrané
@@ -93,7 +97,7 @@ END
 -- Trigger pøepoèítá pøidá vlaku do poètu v oblasti
 --
 -- @author Radek Vais
-CREATE OR REPLACE TRIGGER trigger_bi_sem_mina_placed
+CREATE OR REPLACE TRIGGER trigger_ai_sem_mina_placed
 AFTER INSERT
 ON sem_mina
 FOR EACH ROW
@@ -118,7 +122,7 @@ END
 -- Trigger pøepoèítá aktuální poèet vlajek v oblasti
 --
 -- @author Radek Vais
-CREATE OR REPLACE TRIGGER trigger_bi_sem_mina_removed
+CREATE OR REPLACE TRIGGER trigger_ad_sem_mina_removed
 AFTER DELETE
 ON sem_mina
 FOR EACH ROW
@@ -129,7 +133,7 @@ BEGIN
   -- urèi id oblasti do které byl zahrán tah
    SELECT o.id INTO vn_oblast_id FROM sem_pole p, sem_oblast o
    WHERE o.id = p.oblast
-   AND p.id = :new.pole;
+   AND p.id = :old.pole;
    
    -- mazaní min snižuje poèet vlajek ve høe
    UPDATE sem_hra set pocet_vlajek = (pocet_vlajek -1  )
@@ -137,35 +141,25 @@ BEGIN
 END
 ;
 
----- Trigger pøi úpravì záznamu v tabulce pole zkontroluje, zda nastal vyherní stav
----- a pøíadnì ukonèí hru.
-----
----- @author Radek Vais
---CREATE OR REPLACE TRIGGER trigger_au_sem_tah_vyhra
---AFTER INSERT
---ON sem_tah
---FOR EACH ROW
---DECLARE
---    vn_id_oblast NUMBER;
---BEGIN
---    SELECT p.oblast INTO vn_id_oblast FROM sem_pole p WHERE p.id = :new.pole;
---    MINESWEEPER_AUTOMATION.VYHRA(vn_id_oblast);
---END
---;
 
-
----- Trigger pøi úpravì záznamu v tabulce hra zkontroluje, zda nastal stav prohry
----- a pøíadnì ukonèí hru.
-----
----- @author Radek Vais
---CREATE OR REPLACE TRIGGER trigger_au_sem_tah_prohra
---AFTER INSERT
---ON sem_tah
---FOR EACH ROW
---DECLARE
---    vn_id_oblast NUMBER;
---BEGIN
---    SELECT p.oblast INTO vn_id_oblast FROM sem_pole p WHERE p.id = :new.pole;
---    MINESWEEPER_AUTOMATION.PROHRA(vn_id_oblast);
---END
---;
+-- Trigger kontroluje poèet vlajek na poli
+--
+-- @author Radek Vais
+CREATE OR REPLACE TRIGGER trigger_bi_sem_mina_placed
+BEFORE INSERT
+ON sem_mina
+FOR EACH ROW
+DECLARE
+BEGIN
+        IF(MINESWEEPER_AUTOMATION.MNOHO_MIN(:new.pole) = 0) THEN
+            raise_application_error (-20005, 'Nelze oznaèit více polí než min.');
+        END IF;
+ END;
+ 
+ CREATE OR REPLACE TRIGGER trigger_bi_sem_oblast_param
+ BEFORE INSERT
+ ON sem_oblast
+ FOR EACH ROW
+ BEGIN
+    MINESWEEPER_AUTOMATION.SPATNY_PARAMETR(:new.sirka, :new.vyska, :new.miny);
+END;

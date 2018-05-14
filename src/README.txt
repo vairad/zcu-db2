@@ -15,6 +15,7 @@ create_table_hra.sql
 
 --create views
 
+create_view_chybne_miny.sql
 create_view_vitezove.sql
 create_view_porazeni.sql
 create_view_chybne_miny.sql

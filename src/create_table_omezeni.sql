@@ -27,3 +27,16 @@ COMMENT ON COLUMN sem_omezeni.name IS 'Textový název omezení.';
 COMMENT ON COLUMN sem_omezeni.n_value IS 'Numerická hodnota.';
 
 COMMENT ON COLUMN sem_omezeni.c_value IS 'Textová hodnota.';
+
+
+INSERT INTO sem_omezeni(id, name, n_value) VALUES (1, 'max_sirka', 100);
+
+INSERT INTO sem_omezeni(id, name, n_value) VALUES (2, 'max_vyska', 100);
+
+INSERT INTO sem_omezeni(id, name, n_value) VALUES (3, 'min_sirka', 9);
+
+INSERT INTO sem_omezeni(id, name, n_value) VALUES (4, 'min_vyska', 9);
+
+INSERT INTO sem_omezeni(id, name, n_value) VALUES (5, 'min_miny', 1);
+
+INSERT INTO sem_omezeni(id, name, n_value) VALUES (6, 'p_miny', 40);

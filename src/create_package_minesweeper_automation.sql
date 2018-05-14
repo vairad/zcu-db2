@@ -1,6 +1,6 @@
 /*<TOAD_FILE_CHUNK>*/
 -- =======================================
---  Package, která obstarává 
+--  Package, která obstarává automatické události vyvolané triggery nebo uživatelem.
 --
 -- @author Radek Vais
 -- @version 23.3.2018
@@ -27,14 +27,32 @@ AS
                     , an_sirka IN NUMBER
                     , an_vyska IN NUMBER
                     )
-    RETURN NUMBER;
+        RETURN NUMBER;
     
     PROCEDURE ODKRYJ_POLE(an_pole_id IN NUMBER);
     
     PROCEDURE VYHRA(an_oblast_id IN NUMBER);
+    
     PROCEDURE PROHRA(an_oblast_id IN NUMBER);
+    
     PROCEDURE ZOBRAZ_OBLAST(an_oblast_id IN NUMBER);
     
+    PROCEDURE OZNAC_MINY(an_oblast_id IN NUMBER);
+    
+    FUNCTION MNOHO_MIN(an_pole_id IN NUMBER)
+        RETURN NUMBER;
+    
+    PROCEDURE UKONCENA_HRA(an_pole_id IN NUMBER);
+    
+    FUNCTION VYTVOR_VLASTNI_OBLAST(an_sirka IN NUMBER
+                                    ,an_vyska IN NUMBER
+                                    ,an_miny IN NUMBER)
+        RETURN NUMBER;  
+    
+    PROCEDURE SPATNY_PARAMETR(an_sirka IN NUMBER
+                                ,an_vyska IN NUMBER
+                                ,an_miny IN NUMBER); 
+        
     
 END MINESWEEPER_AUTOMATION;
 /
@@ -185,6 +203,7 @@ AS
     PROCEDURE VYTVOR_HRU( an_id_oblast IN NUMBER)
     IS
     BEGIN
+        dbms_output.put_line('Vytváøím záznam hry pro oblast: ' || an_id_oblast);
         INSERT INTO sem_hra (id, oblast, stav) VALUES (seq_sem_hra_id.nextval, an_id_oblast, 1);
     END VYTVOR_HRU;
     
@@ -225,10 +244,16 @@ AS
           WHERE id = an_oblast_id;
           
         IF (an_pole - an_slapnute) = an_miny THEN
-            dbms_output.put_line('Vítìzství!');
+            
             -- uprav záznam o høe pro danou oblast, pokud je nová nebo rozehraná.
             UPDATE sem_hra SET stav = 3, konec = sysdate WHERE oblast = an_oblast_id AND stav = 1 OR stav = 2;
+            IF sql%rowcount > 0 THEN
+                dbms_output.put_line('Vítìzství!');
+            END IF;
+
             MINESWEEPER_AUTOMATION.ZOBRAZ_OBLAST(an_oblast_id);
+            MINESWEEPER_AUTOMATION.OZNAC_MINY(an_oblast_id);
+            
         END IF;
     END VYHRA;
     
@@ -245,10 +270,14 @@ AS
               AND zobrazeno = 1;
                         
         IF (an_slapnute > 0) THEN
-            dbms_output.put_line('Šlápl jsi na minu! Prohra.');
             -- uprav záznam o høe pro danou oblast, pokud je nová nebo rozehraná.
             UPDATE sem_hra SET stav = 4, konec = sysdate WHERE oblast = an_oblast_id AND stav = 1 OR stav = 2;
-            MINESWEEPER_AUTOMATION.ZOBRAZ_OBLAST(an_oblast_id);
+            IF sql%rowcount > 0 THEN
+                dbms_output.put_line('Šlápl jsi na minu! Prohra.');
+            END IF;
+            
+           -- MINESWEEPER_AUTOMATION.ZOBRAZ_OBLAST(an_oblast_id);
+            
         END IF;
     END PROHRA;
     
@@ -258,6 +287,110 @@ AS
         UPDATE sem_pole SET zobrazeno = 1 WHERE oblast = an_oblast_id;
     END ZOBRAZ_OBLAST;
     
+    PROCEDURE OZNAC_MINY(an_oblast_id IN NUMBER)
+    IS
+    BEGIN
+        FOR mina IN (SELECT id FROM sem_pole WHERE oblast = an_oblast_id AND info_mina = 9)
+        LOOP
+            BEGIN
+                INSERT INTO sem_mina(pole) VALUES (mina.id);
+            EXCEPTION
+                WHEN DUP_VAL_ON_INDEX THEN
+                CONTINUE;
+            END;
+        END LOOP;
+    END OZNAC_MINY;
+    
+    
+    FUNCTION MNOHO_MIN(an_pole_id IN NUMBER)
+    RETURN NUMBER
+    IS
+        vn_vlajky NUMBER;
+        vn_miny NUMBER;
+    BEGIN
+        SELECT h.pocet_vlajek, o.miny
+        INTO vn_vlajky, vn_miny
+        FROM sem_hra h
+        LEFT JOIN sem_oblast o ON h.oblast = o.id
+        LEFT JOIN sem_pole p ON o.id = p.oblast
+        WHERE p.id = an_pole_id; 
+        
+        RETURN vn_miny - vn_vlajky;
+    END MNOHO_MIN;
+    
+    PROCEDURE UKONCENA_HRA(an_pole_id IN NUMBER)
+    IS
+        vn_stav NUMBER;
+    BEGIN
+        SELECT h.stav
+        INTO vn_stav
+        FROM sem_hra h
+        LEFT JOIN sem_oblast o ON h.oblast = o.id
+        LEFT JOIN sem_pole p ON o.id = p.oblast
+        WHERE p.id = an_pole_id; 
+        
+        IF(vn_stav > 2) THEN
+            raise_application_error (-20004, 'Hra byla již uzavøena.');
+        END IF;
+        
+    END UKONCENA_HRA;
+    
+    FUNCTION VYTVOR_VLASTNI_OBLAST(an_sirka IN NUMBER
+                                    ,an_vyska IN NUMBER
+                                    ,an_miny IN NUMBER)
+    RETURN NUMBER
+    IS
+        vn_id_oblast NUMBER;
+    BEGIN
+        vn_id_oblast := seq_sem_oblast_id.nextval();
+        
+        INSERT INTO sem_oblast (id, sirka, vyska, miny)
+        VALUES(vn_id_oblast, an_sirka, an_vyska, an_miny);
+        
+        RETURN vn_id_oblast;
+    END VYTVOR_VLASTNI_OBLAST;
+     
+    
+    PROCEDURE SPATNY_PARAMETR(an_sirka IN NUMBER
+                        ,an_vyska IN NUMBER
+                        ,an_miny IN NUMBER)
+    IS
+        vn_value NUMBER;
+    BEGIN
+    
+    --sirka max
+       SELECT COALESCE(n_value, 100) INTO vn_value FROM sem_omezeni WHERE name = 'max_sirka' ;
+            IF (an_sirka > vn_value) THEN
+                raise_application_error (-20006, 'Obtížnost pøekrèuje maximální šíøku.'); 
+            END IF;
+    --sirka min
+        SELECT COALESCE(n_value, 1) INTO vn_value FROM sem_omezeni WHERE name = 'min_sirka' ;
+            IF (an_sirka < vn_value) THEN
+                raise_application_error (-20007, 'Obtížnost pøekrèuje minimální šíøku.'); 
+            END IF;
+    --vyska
+        SELECT COALESCE(n_value, 100) INTO vn_value FROM sem_omezeni WHERE name = 'max_vyska' ;
+            IF (an_vyska > vn_value) THEN
+                raise_application_error (-20008, 'Obtížnost pøekrèuje maximální výšku.'); 
+            END IF;
+       
+        SELECT COALESCE(n_value, 1) INTO vn_value FROM sem_omezeni WHERE name = 'min_vyska' ;
+            IF (an_vyska < vn_value) THEN
+                raise_application_error (-20009, 'Obtížnost pøekrèuje minimální výšku.'); 
+            END IF;
+    --pocet min
+        SELECT COALESCE(n_value, 1) INTO vn_value FROM sem_omezeni WHERE name = 'min_miny' ;
+            IF (an_miny < vn_value) THEN
+                raise_application_error (-20010, 'Obtížnost obsahuje málo min.'); 
+            END IF;
+            
+        SELECT COALESCE(n_value, 10) INTO vn_value FROM sem_omezeni WHERE name = 'p_miny' ;
+            IF (an_miny > (vn_value * an_sirka * an_vyska / 100 )) THEN
+                raise_application_error (-20010, 'Obtížnost obsahuje mnoho min.'); 
+            END IF;
+    END;                            
+
+
 END MINESWEEPER_AUTOMATION;
 /
 
