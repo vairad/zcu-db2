@@ -1,0 +1,65 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[IL2]{fontenc}
+\usepackage[czech]{babel}
+\usepackage{graphicx}
+
+\begin{document}
+\begin{figure}[h!]
+\centering
+\includegraphics[bb= 0 0 820 445 , width=75mm]{favlogo.jpg}
+\end{figure}
+
+{\centering
+{\huge Hledání min}\\[1em]
+{\large KIV/DB2}\\[11,5cm]
+}
+
+\begin{tabular}{l r}
+student: & Radek VAIS\\
+os. číslo: & A17N0093P\\
+mail: & vaisr@students.zcu.cz\\
+datum: & 14.5.2018\\
+\end{tabular}
+
+\thispagestyle{empty}
+\newpage
+
+%========================================
+%========================================
+%========================================
+%========================================
+%========================================
+\section{Zadání} %=====================================================================================================
+
+Navrhněte a vytvořte relační databázi pro hraní známé počítačové hry Hledání min. Protože bude řešena pouze databázová vrstva aplikace, snažte se co nejvíce programových rutin uložit do databáze a také zajistěte jejich automatickou aktivaci při nastalé události.
+Herní oblast má zpravidla tvar obdélníku, ve kterém se nachází několik min. Velikost oblasti a počet min v ní definuje obtížnost hry. Hráč si může vybrat jednu ze tří předdefinovaných obtížností nebo si může definovat obtížnost vlastní. Úkolem hráče je odkrýt všechna pole oblasti, která nejsou zaminována. Hráči se bude od začátku hry měřit čas, aby bylo možné dosažené výsledky porovnávat. Po odkrytí libovolného pole (hráčem nebo databází) může nastat jedna z těchto událostí:
+
+\begin{itemize}
+\item Hráč šlápl na minu. Hra končí neúspěchem a výsledek se zaznamená do databáze.
+\item Bylo odkryto poslední pole, na kterém není mina. Hra končí úspěchem, protože zbylá neodkrytá pole obsahují miny. Také v tomto případě se výsledek uloží do databáze.
+\item Bylo odkryto pole, které je volné a nesousedí s žádným zaminovaným polem. V tomto případě databáze automaticky odkryje všechna sousední pole – ty mají společný min. jeden vrchol.
+\end{itemize}
+
+Pro snazší hraní si může hráč označovat ta pole, o kterých si myslí, že jsou zaminovaná. K tomuto rozhodnutí mu pomohou čísla již odkrytých polí, která určují, s kolika zaminovanými poli toto pole sousedí. Takto označené pole nelze odkrýt, ale toto označení lze kdykoliv zrušit.
+
+%========================================
+\newpage
+
+\section{Popis řešení}
+
+\subsection{ERA model}
+
+\subsection{Procedury}
+
+\subsection{Triggery}
+
+\section{Ovládání}
+
+\subsection{Nasazení}
+
+\subsection{Hra}
+
+\subsection{Závěr}
+
+\end{document}
