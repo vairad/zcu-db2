@@ -1,10 +1,18 @@
 DECLARE
 BEGIN
+-- id obtiznosti
    MINESWEEPER.VYTVOR_HRU(1);
 END;
 
 DECLARE
 BEGIN
+-- sirka vyska miny
+   MINESWEEPER.VLASTNI_HRA(20, 10, 10);
+END;
+
+DECLARE
+BEGIN
+-- oblast x(vodorovně) y(svisle)
   MINESWEEPER.TAH(3, 1, 6 );
  --   MINESWEEPER.TAH(3, 9, 2 );
   MINESWEEPER.OBLAST_TISK(3);
@@ -12,12 +20,14 @@ END;
 
 DECLARE
 BEGIN
+-- oblast x(vodorovně) y(svisle)
   MINESWEEPER.MINA(3, 7, 7 );
   MINESWEEPER.OBLAST_TISK(3);
 END;
 
 DECLARE
 BEGIN
+-- oblast x(vodorovně) y(svisle)
   MINESWEEPER.MINA(51, 8, 9 );
   MINESWEEPER.MINA(51, 7, 9 );
   MINESWEEPER.MINA(51, 6, 9 );
@@ -31,8 +41,13 @@ END;
 
 DECLARE
 BEGIN
+-- oblast
   MINESWEEPER.OBLAST_TISK(3);
 END;
 
 
 SELECT * FROM sem_porazeni;
+
+SELECT * FROM sem_vitezove;
+
+SELECT * FROM sem_chybne_miny WHERE oblast = 3;
