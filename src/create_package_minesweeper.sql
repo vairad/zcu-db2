@@ -1,6 +1,6 @@
 /*<TOAD_FILE_CHUNK>*/
 -- =======================================
---
+-- Package slouží ke sdružení funkcí rozhraní hry Hledání min.
 --
 -- @author Radek Vais
 -- @version 23.3.2018
@@ -10,6 +10,19 @@ CREATE OR REPLACE PACKAGE VAISR.MINESWEEPER
 AS
     PROCEDURE VYTVOR_HRU(an_id_obtiznost NUMBER);
     
+    PROCEDURE VLASTNI_HRA(an_sirka NUMBER
+                        ,an_vyska NUMBER
+                        ,an_miny NUMBER);
+    
+    PROCEDURE TAH(an_id_oblast IN NUMBER
+                    ,an_x IN NUMBER
+                    ,an_y IN NUMBER);
+                    
+    PROCEDURE MINA(an_id_oblast IN NUMBER
+                    ,an_x IN NUMBER
+                    ,an_y IN NUMBER);
+                   
+                        
     FUNCTION ZNAK_POLE( an_info_mina IN NUMBER
                         , an_zobrazeno IN NUMBER
                         , an_vlajka IN NUMBER)
@@ -20,18 +33,6 @@ AS
         RETURN VARCHAR2;
         
     PROCEDURE OBLAST_TISK (an_id_oblast IN NUMBER);
-    
-    PROCEDURE TAH(an_id_oblast IN NUMBER
-                    ,an_x IN NUMBER
-                    ,an_y IN NUMBER);
-                    
-    PROCEDURE MINA(an_id_oblast IN NUMBER
-                    ,an_x IN NUMBER
-                    ,an_y IN NUMBER);
-                    
-    PROCEDURE VLASTNI_HRA(an_sirka NUMBER
-                        ,an_vyska NUMBER
-                        ,an_miny NUMBER);
 END;
 /
 
@@ -43,10 +44,7 @@ AS
     IS
         vn_id_oblast NUMBER;
     BEGIN
-       vn_id_oblast := MINESWEEPER_AUTOMATION.VYTVOR_OBLAST(an_id_obtiznost);
-       MINESWEEPER_AUTOMATION.ZAMINUJ_OBLAST(vn_id_oblast);
-       MINESWEEPER_AUTOMATION.SPOCITEJ_OBLAST(vn_id_oblast);
-       MINESWEEPER_AUTOMATION.VYTVOR_HRU(vn_id_oblast);
+       INSERT INTO sem_oblast (obtiznost) VALUES (an_id_obtiznost); 
     END;
     
     PROCEDURE VLASTNI_HRA(an_sirka NUMBER
@@ -55,10 +53,7 @@ AS
     IS
         vn_id_oblast NUMBER;
     BEGIN
-       vn_id_oblast := MINESWEEPER_AUTOMATION.VYTVOR_VLASTNI_OBLAST(an_sirka, an_vyska, an_miny);
-       MINESWEEPER_AUTOMATION.ZAMINUJ_OBLAST(vn_id_oblast);
-       MINESWEEPER_AUTOMATION.SPOCITEJ_OBLAST(vn_id_oblast);
-       MINESWEEPER_AUTOMATION.VYTVOR_HRU(vn_id_oblast);
+       INSERT INTO sem_oblast (sirka, vyska, miny) VALUES (an_sirka,an_vyska, an_miny);
     END VLASTNI_HRA;
     
     FUNCTION ZNAK_POLE( an_info_mina IN NUMBER
@@ -131,8 +126,8 @@ AS
         INSERT INTO sem_tah (pole) VALUES (vn_pole_id);
         
     EXCEPTION
-    WHEN OTHERS THEN
-        dbms_output.put_line(SQLERRM);
+    WHEN DUP_VAL_ON_INDEX THEN
+        dbms_output.put_line('Pole je již oznaèené.');
     END TAH;
     
     PROCEDURE MINA(an_id_oblast IN NUMBER
@@ -140,11 +135,15 @@ AS
                     ,an_y IN NUMBER)
     IS
         vn_pole_id NUMBER;
-        vn_miny NUMBER;
-        vn_vlajky NUMBER;
-        vn_exist NUMBER;
     BEGIN
            
+        SELECT id 
+        INTO vn_pole_id 
+        FROM sem_pole 
+        WHERE oblast = an_id_oblast
+            AND x = an_x
+            AND y = an_y;
+            
         INSERT INTO sem_mina (pole) VALUES (vn_pole_id);
         
     EXCEPTION

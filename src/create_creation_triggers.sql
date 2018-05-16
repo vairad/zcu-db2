@@ -1,27 +1,8 @@
--- Trigger vytvoøí pole pro právì vytvoøenou oblast.
---
--- @author Radek Vais
-CREATE OR REPLACE TRIGGER trigger_ai_sem_oblast
-AFTER INSERT
-ON sem_oblast
-FOR EACH ROW
-DECLARE
-    vn_result NUMBER;
-BEGIN
-    dbms_output.put_line('Vytváøím pole pro oblast: '|| :new.id);
-    vn_result := minesweeper_automation.VYTVOR_POLE(:new.id, :new.sirka, :new.vyska);
-    IF vn_result = -1 THEN
-        dbms_output.put_line('Nepodaøilo se vytvoøit pole');
-        DELETE FROM sem_oblast WHERE id = :new.id;
-    END IF;
-END
-;
-
 -- Trigger po vložení tahu do tabulky sem_tah odkryje všechna možná pole pomocí
 -- procedury ODKRYJ_POLE.
 --
 -- @author Radek Vais
-CREATE OR REPLACE TRIGGER trigger_ai_sem_tah_played
+CREATE OR REPLACE TRIGGER t_ai_sem_tah_played
 AFTER INSERT 
 ON sem_tah
 FOR EACH ROW
@@ -50,7 +31,7 @@ END
 -- Trigger pøed vložením záznamu do tabulky tah nastaví aktuální èas tahu.
 --
 -- @author Radek Vais
-CREATE OR REPLACE TRIGGER trigger_bi_sem_tah
+CREATE OR REPLACE TRIGGER t_bi_sem_tah
 BEFORE INSERT 
 ON sem_tah
 FOR EACH ROW
@@ -68,7 +49,7 @@ END
 -- pole má vlajku miny
 --
 -- @author Radek Vais
-CREATE OR REPLACE TRIGGER trigger_bi_sem_tah_showed
+CREATE OR REPLACE TRIGGER t_bi_sem_tah_showed
 BEFORE INSERT 
 ON sem_tah
 FOR EACH ROW
@@ -97,7 +78,7 @@ END
 -- Trigger pøepoèítá pøidá vlaku do poètu v oblasti
 --
 -- @author Radek Vais
-CREATE OR REPLACE TRIGGER trigger_ai_sem_mina_placed
+CREATE OR REPLACE TRIGGER t_ai_sem_mina_placed
 AFTER INSERT
 ON sem_mina
 FOR EACH ROW
@@ -122,7 +103,7 @@ END
 -- Trigger pøepoèítá aktuální poèet vlajek v oblasti
 --
 -- @author Radek Vais
-CREATE OR REPLACE TRIGGER trigger_ad_sem_mina_removed
+CREATE OR REPLACE TRIGGER t_ad_sem_mina_removed
 AFTER DELETE
 ON sem_mina
 FOR EACH ROW
@@ -145,21 +126,72 @@ END
 -- Trigger kontroluje poèet vlajek na poli
 --
 -- @author Radek Vais
-CREATE OR REPLACE TRIGGER trigger_bi_sem_mina_placed
+CREATE OR REPLACE TRIGGER t_bi_sem_mina_count
 BEFORE INSERT
 ON sem_mina
 FOR EACH ROW
 DECLARE
 BEGIN
-        IF(MINESWEEPER_AUTOMATION.MNOHO_MIN(:new.pole) = 0) THEN
-            raise_application_error (-20005, 'Nelze oznaèit více polí než min.');
-        END IF;
+    IF(MINESWEEPER_AUTOMATION.MNOHO_MIN(:new.pole) = 0) THEN
+        raise_application_error (-20005, 'Nelze oznaèit více polí než min.');
+    END IF;
  END;
  
- CREATE OR REPLACE TRIGGER trigger_bi_sem_oblast_param
+ CREATE OR REPLACE TRIGGER t_bi_sem_oblast_param
  BEFORE INSERT
  ON sem_oblast
  FOR EACH ROW
  BEGIN
     MINESWEEPER_AUTOMATION.SPATNY_PARAMETR(:new.sirka, :new.vyska, :new.miny);
 END;
+
+
+-- Trigger doplní .
+--
+-- @author Radek Vais
+CREATE OR REPLACE TRIGGER t_bi_sem_oblast
+BEFORE INSERT
+ON sem_oblast
+FOR EACH ROW
+DECLARE
+    vn_sirka NUMBER;
+    vn_vyska NUMBER;
+    vn_miny NUMBER;
+BEGIN
+    IF :new.obtiznost IS NOT NULL THEN
+        SELECT pocet_min, sirka, vyska
+          INTO vn_miny, vn_sirka, vn_vyska
+        FROM sem_obtiznost
+          WHERE id = :new.obtiznost
+        ;
+        
+        :new.sirka := vn_sirka;
+        :new.vyska := vn_vyska;
+        :new.miny := vn_miny;
+    END IF;
+END
+;
+
+
+-- Trigger vytvoøí pole pro právì vytvoøenou oblast.
+--
+-- @author Radek Vais
+CREATE OR REPLACE TRIGGER t_ai_sem_oblast
+AFTER INSERT
+ON sem_oblast
+FOR EACH ROW
+DECLARE
+    vn_result NUMBER;
+BEGIN 
+    dbms_output.put_line('Vytváøím pole pro oblast: '|| :new.id);
+    vn_result := minesweeper_automation.VYTVOR_POLE(:new.id, :new.sirka, :new.vyska);
+    IF vn_result = -1 THEN
+        dbms_output.put_line('Nepodaøilo se vytvoøit pole');
+        DELETE FROM sem_oblast WHERE id = :new.id;
+        raise_application_error (-20007, 'Nepodaøilo se vytvoøit pole v DB');
+    END IF;
+    MINESWEEPER_AUTOMATION.ZAMINUJ_OBLAST(:new.id, :new.sirka, :new.vyska, :new.miny);
+    MINESWEEPER_AUTOMATION.SPOCITEJ_OBLAST(:new.id);
+    MINESWEEPER_AUTOMATION.VYTVOR_HRU(:new.id);
+END
+;

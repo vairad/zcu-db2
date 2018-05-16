@@ -32,7 +32,7 @@ CREATE SEQUENCE seq_sem_pole_id
 
 --DROP TRIGGER trigger_bi_sem_pole_id;
 
-CREATE OR REPLACE TRIGGER trigger_bi_sem_pole_id
+CREATE OR REPLACE TRIGGER t_bi_sem_pole_id
 BEFORE INSERT 
 ON sem_pole
 FOR EACH ROW

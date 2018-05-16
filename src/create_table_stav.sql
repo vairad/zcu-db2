@@ -19,7 +19,7 @@ CREATE TABLE sem_stav
 
 COMMENT ON TABLE sem_stav IS 'Číselník stavů hry';
 
-COMMENT ON COLUMN sem_stav.id_stav IS 'Manuálně určované ID';
+COMMENT ON COLUMN sem_stav.id IS 'Manuálně určované ID';
 
 COMMENT ON COLUMN sem_stav.nazev IS 'Uživatelsky přívětivý název stavu hry';
 
@@ -39,6 +39,6 @@ INSERT INTO sem_stav(id, nazev)
 VALUES (3, 'Vyhraná')
 ;
 
-INSERT INTO sem_stav(id_stav, nazev) 
+INSERT INTO sem_stav(id, nazev) 
 VALUES (4, 'Prohraná')
 ;

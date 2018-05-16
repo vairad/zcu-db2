@@ -13,8 +13,7 @@
 CREATE TABLE sem_omezeni(
     id NUMBER (10) PRIMARY KEY,
     name VARCHAR2(50) NOT NULL,
-    n_value NUMBER(10),
-    c_value VARCHAR2(50)
+    n_value NUMBER(10)
 )
 ;
 
@@ -25,8 +24,6 @@ COMMENT ON COLUMN sem_omezeni.id IS 'ID omezení.';
 COMMENT ON COLUMN sem_omezeni.name IS 'Textový název omezení.';
 
 COMMENT ON COLUMN sem_omezeni.n_value IS 'Numerická hodnota.';
-
-COMMENT ON COLUMN sem_omezeni.c_value IS 'Textová hodnota.';
 
 
 -- =============================================================================

@@ -7,7 +7,7 @@
 -- @version 28.4.2018
 -- =======================================
 
-DROP TABLE sem_hra;
+--DROP TABLE sem_hra;
 
 CREATE TABLE sem_hra
 (

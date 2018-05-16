@@ -9,7 +9,10 @@
 CREATE OR REPLACE PACKAGE VAISR.MINESWEEPER_AUTOMATION
 AS
 
-    PROCEDURE ZAMINUJ_OBLAST( an_id_oblast IN NUMBER);
+    PROCEDURE ZAMINUJ_OBLAST( an_id_oblast IN NUMBER
+                            , an_sirka NUMBER
+                            , an_vyska NUMBER
+                            , an_miny NUMBER);
     
     PROCEDURE SPOCITEJ_OBLAST( an_id_oblast IN NUMBER);
     
@@ -20,8 +23,6 @@ AS
                                 ,an_y     IN NUMBER)
         RETURN NUMBER;
     
-    FUNCTION VYTVOR_OBLAST(an_id_obtiznost IN NUMBER) 
-        RETURN NUMBER;
     
     FUNCTION VYTVOR_POLE(an_id_oblast IN NUMBER
                     , an_sirka IN NUMBER
@@ -61,29 +62,20 @@ END MINESWEEPER_AUTOMATION;
 CREATE OR REPLACE PACKAGE BODY VAISR.MINESWEEPER_AUTOMATION
 AS     
         
-    PROCEDURE ZAMINUJ_OBLAST(an_id_oblast NUMBER)
+    PROCEDURE ZAMINUJ_OBLAST(an_id_oblast NUMBER, an_sirka NUMBER, an_vyska NUMBER, an_miny NUMBER)
     IS
-        vn_miny NUMBER;
         vn_x NUMBER;
         vn_y NUMBER;
         vn_placed NUMBER;
-        vn_sirka NUMBER;
-        vn_vyska NUMBER;
     BEGIN        
         vn_placed := 0;
         
-        SELECT miny, sirka, vyska
-          INTO vn_miny, vn_sirka, vn_vyska
-        FROM sem_oblast
-          WHERE id = an_id_oblast
-        ;
+        dbms_output.put_line('Pokládám ' || an_miny || ' min do oblasti: ' || an_id_oblast);
         
-        dbms_output.put_line('Pokládám ' || vn_miny || ' min do oblasti: ' || an_id_oblast);
-        
-        WHILE vn_miny > vn_placed
+        WHILE an_miny > vn_placed
         LOOP
-            vn_x := ROUND(DBMS_RANDOM.VALUE( 1 , vn_sirka));
-            vn_y := ROUND(DBMS_RANDOM.VALUE( 1 , vn_vyska));
+            vn_x := ROUND(DBMS_RANDOM.VALUE( 1 , an_sirka));
+            vn_y := ROUND(DBMS_RANDOM.VALUE( 1 , an_vyska));
             --dbms_output.put_line('Pokládám minu na: ' || vn_x || ',' || vn_y);
             UPDATE sem_pole 
                 SET info_mina = 9 
@@ -142,41 +134,6 @@ AS
         END IF;
         RETURN vn_miny_info;
     END SPOCITEJ_POLE;
-    
-    
-    FUNCTION VYTVOR_OBLAST(an_id_obtiznost IN NUMBER)
-    RETURN NUMBER
-    IS
-      vn_id_oblast NUMBER;
-      vn_sirka     NUMBER;
-      vn_vyska     NUMBER;
-      vn_miny      NUMBER;
-      vc_nazev_obtiznost VARCHAR2(50);
-    BEGIN
-        SELECT nazev
-            , sirka
-            , vyska
-            , pocet_min
-         INTO vc_nazev_obtiznost
-            , vn_sirka
-            , vn_vyska
-            , vn_miny
-            FROM sem_obtiznost
-          WHERE id = an_id_obtiznost;
-          
-        dbms_output.put_line('Vytváøím novou oblast dle obtížnosti: ' || vc_nazev_obtiznost);
-        
-        vn_id_oblast := seq_sem_oblast_id.nextval();
-        
-        INSERT INTO sem_oblast (id, sirka, vyska, miny)
-        VALUES(vn_id_oblast, vn_sirka, vn_vyska, vn_miny);
-        
-        return vn_id_oblast;
-    EXCEPTION  
-        WHEN OTHERS THEN
-            return -1;
-
-    END VYTVOR_OBLAST;
     
     
     FUNCTION VYTVOR_POLE(an_id_oblast IN NUMBER
@@ -308,7 +265,7 @@ AS
         vn_vlajky NUMBER;
         vn_miny NUMBER;
     BEGIN
-        SELECT h.pocet_vlajek, o.miny
+        SELECT COALESCE(h.pocet_vlajek,0) , COALESCE(o.miny,0)
         INTO vn_vlajky, vn_miny
         FROM sem_hra h
         LEFT JOIN sem_oblast o ON h.oblast = o.id

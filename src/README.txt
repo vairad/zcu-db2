@@ -18,15 +18,18 @@ create_table_hra.sql
 create_view_chybne_miny.sql
 create_view_vitezove.sql
 create_view_porazeni.sql
-create_view_chybne_miny.sql
+
 
 -- create package for automatic events
 
 create_package_minesweeper_automation.sql
 
+
 --create special triggers
 
 create_creation_triggers.sql
+
+create_view_chybne_miny.sql
 
 
 -- create gaming package
